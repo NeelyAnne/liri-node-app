@@ -8,72 +8,61 @@ var axios = require("axios");
 var choice = process.argv[2];
 var query = process.argv[3];
 
-// Initialize Spotify client
 var spotify = new Spotify(keys.spotify);
 switch (choice) {
   case "movie-this":
-    movieThis(query);
+    movieMe(query);
     break;
   case "spotify-this-song":
-    spotifyCall(query);
+    spotifyMe(query);
     break;
   case "concert-this":
-    concertThis(query);
+    concertMe(query);
     break;
   default:
-    // 1- read file
     fs.readFile("random.txt", "utf8", function(error, data) {
-      // 2-retrieve content & parse string
       var data = data.split(",");
-      var thatWay = data[1];
+      var finalData = data[1];
       if (error) {
         return console.log(error);
       }
-      // 3-call function
-      spotifyCall(thatWay);
+      spotifyMe(finalData);
     });
 }
 
-// FUNCTIONS
-// SPOTIFY-THIS-SONG
-function spotifyCall(songName) {
+function spotifyMe(songName) {
   spotify.search({ type: "track", query: songName }, function(err, data) {
     if (err) {
-      return console.log("Error occurred: " + err);
+      return console.log(err);
     }
     console.log(
-      "\n_Track Info_" +
+      "\n_Song Information_" +
         "\nArtist: " +
         data.tracks.items[0].artists[0].name +
         "\nSong: " +
         data.tracks.items[0].name +
-        "\nLink: " +
+        "\nExternal Link: " +
         data.tracks.items[0].external_urls.spotify +
         "\nAlbum: " +
         data.tracks.items[0].album.name +
         "\n" +
-        "\nGreat song! Search another :)"
+        "\nI love that song, got any more?"
     );
   });
 }
 
-// MOVIE-THIS
-// Then run a request with axios to the OMDB API with the movie specified
-function movieThis(movieName) {
+function movieMe(movieName) {
   if (!movieName) {
-    movieName = "Mr. Nobody";
+    movieName = "Dunkirk";
   }
   var queryUrl =
     "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-  // // This line is just to help us debug against the actual URL.
-  // Creating a request with axios to the queryUrl
   axios.get(queryUrl).then(function(response) {
     if (!movieName) {
-      movieName = "Mr. Nobody";
-    } // console.log(response.data);
-    // Data of Movie
+      movieName = "Dunkirk";
+    }
     console.log(
-      "\n_Movie Info_" +
+      "\n_Movie Information_" +
         "\nTitle: " +
         response.data.Title +
         "\nRelease Year: " +
@@ -89,32 +78,28 @@ function movieThis(movieName) {
         "\nActors: " +
         response.data.Actors +
         "\n" +
-        "\n Love this one!"
+        "\nI wish they made a million of these!"
     );
   });
 }
 
-// CONCERT-THIS
-// Then run a request with axios to the BiT API with the artist specified
-function concertThis(artist) {
-  var bandsQueryUrl =
+function concertMe(artist) {
+  var queryURL =
     "https://rest.bandsintown.com/artists/" +
     artist +
     "/events?app_id=codingbootcamp";
-  // // This line is just to help us debug against the actual URL.
-  // Creating a request with axios to the queryUrl
-  axios.get(bandsQueryUrl).then(function(response) {
+  axios.get(queryURL).then(function(response) {
     console.log("_Upcoming Events_");
     console.log(
-      "Artist: " +
+      "\nArtist:" +
         artist +
         "\nVenue: " +
         response.data[0].venue.name +
         "\nLocation: " +
         response.data[0].venue.country +
         "\nDate: " +
-        response.data[0].datatime +
-        "\nRock on dude!"
+        response.data[0].datetime +
+        "\nGrab that Ticket!"
     );
   });
 }
