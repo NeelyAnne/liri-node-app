@@ -9,25 +9,24 @@ var choice = process.argv[2];
 var query = process.argv[3];
 
 var spotify = new Spotify(keys.spotify);
-switch (choice) {
-  case "movie-this":
-    movieMe(query);
-    break;
-  case "spotify-this-song":
-    spotifyMe(query);
-    break;
-  case "concert-this":
-    concertMe(query);
-    break;
-  default:
-    fs.readFile("random.txt", "utf8", function(error, data) {
-      var data = data.split(",");
-      var finalData = data[1];
-      if (error) {
-        return console.log(error);
-      }
-      spotifyMe(finalData);
-    });
+
+function workIt(choice, query) {
+  switch (choice) {
+    case "movie-this":
+      movieMe(query);
+      break;
+    case "spotify-this-song":
+      spotifyMe(query);
+      break;
+    case "concert-this":
+      concertMe(query);
+      break;
+    case "do-what-it-says":
+      read(query);
+      break;
+    default:
+      console.log("Try again, wrong command.");
+  }
 }
 
 function spotifyMe(songName) {
@@ -36,7 +35,7 @@ function spotifyMe(songName) {
       return console.log(err);
     }
     console.log(
-      "\n_Song Information_" +
+      "\n-----------Song Information----------" +
         "\nArtist: " +
         data.tracks.items[0].artists[0].name +
         "\nSong: " +
@@ -62,7 +61,7 @@ function movieMe(movieName) {
       movieName = "Dunkirk";
     }
     console.log(
-      "\n_Movie Information_" +
+      "\n----------Movie Information----------" +
         "\nTitle: " +
         response.data.Title +
         "\nRelease Year: " +
@@ -89,7 +88,7 @@ function concertMe(artist) {
     artist +
     "/events?app_id=codingbootcamp";
   axios.get(queryURL).then(function(response) {
-    console.log("_Upcoming Events_");
+    console.log("----------Upcoming Events----------");
     console.log(
       "\nArtist:" +
         artist +
@@ -103,3 +102,18 @@ function concertMe(artist) {
     );
   });
 }
+
+function read() {
+  fs.readFile("random.txt", "utf8", function(err, response) {
+    let params = response.split(",");
+    if (err) {
+      console.log(err);
+    }
+    /* console.log(
+      "here ----------------" + params[0] + "----------------" + params[1]
+    ); */
+    workIt(params[0], params[1]);
+  });
+}
+
+workIt(choice, query);
